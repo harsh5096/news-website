@@ -1,0 +1,22 @@
+.main-card{   
+     display: flex;
+    justify-content: space-around;
+    margin: 20px;
+    border: 2px solid #0000001c;
+    background-color: aliceblue;
+    padding:21px;
+    border-radius: 7px;
+}
+
+@media Screen and (max-width:790px){
+    .main-card{
+        display: flex;
+        flex-direction: column;
+  
+    }
+    .audio {
+        display: flex;
+        margin-top: 21px;
+        justify-content: center;
+    }
+}

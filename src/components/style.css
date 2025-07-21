@@ -1,0 +1,44 @@
+
+
+@media (min-width: 760px){
+.col-md-4 {
+    flex: 0 0 auto;
+    width: 31.333333%;}
+}
+
+.body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+    min-height: 100vh;
+    background-color: aquamarine;
+}
+
+.text-input {
+    display: flex;
+    justify-content: center;
+}
+
+.controls{
+    display: flex;
+    justify-content: space-around;
+}
+
+li{
+    display: flex;
+    list-style:none;
+}
+.icons{
+    display: flex;
+    align-items: center;
+}
+
+.container-translator{
+    border-radius: 14px;
+    /* background-color: aqua; */
+    /* margin: 34px; */
+    min-width: 700px;
+    /* width: 100%; */
+    background-color: white;
+} 
