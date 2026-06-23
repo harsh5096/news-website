@@ -31,31 +31,40 @@ const categoryMap = {
   technology: 'technology',
 };
 
-// This function is responsible for fetching news data from GNews API.
-const updateNews = async () => {
-  const category = categoryMap[props.category] || 'breaking-news';
-  const apiKey = process.env.REACT_APP_GNEWS_API_KEY;
-  const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&max=${props.pageSize}&page=${page}&apikey=${apiKey}`;
-  setloading(true);
-  try {
-    let data = await fetch(url);
-    let parsedData = await data.json();
-    console.log('API Response:', parsedData);
-    if (!parsedData.articles) {
-      console.error('API Error:', parsedData.errors || 'Unknown error');
+  // Helper to determine the API URL. In production, we proxy requests through our
+  // Netlify function to keep the API key secure and prevent CORS issues.
+  const getNewsUrl = (category, pageNum) => {
+    const apiKey = process.env.REACT_APP_GNEWS_API_KEY;
+    if (!apiKey || process.env.NODE_ENV === 'production') {
+      return `/.netlify/functions/news?category=${category}&max=${props.pageSize}&page=${pageNum}`;
+    }
+    return `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&max=${props.pageSize}&page=${pageNum}&apikey=${apiKey}`;
+  };
+
+  // This function is responsible for fetching news data from GNews API.
+  const updateNews = async () => {
+    const category = categoryMap[props.category] || 'breaking-news';
+    const url = getNewsUrl(category, page);
+    setloading(true);
+    try {
+      let data = await fetch(url);
+      let parsedData = await data.json();
+      console.log('API Response:', parsedData);
+      if (!parsedData.articles) {
+        console.error('API Error:', parsedData.errors || 'Unknown error');
+        setarticles([]);
+        settotalResults(0);
+      } else {
+        setarticles(parsedData.articles);
+        settotalResults(parsedData.totalArticles);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
       setarticles([]);
       settotalResults(0);
-    } else {
-      setarticles(parsedData.articles);
-      settotalResults(parsedData.totalArticles);
     }
-  } catch (error) {
-    console.error('Fetch error:', error);
-    setarticles([]);
-    settotalResults(0);
+    setloading(false);
   }
-  setloading(false);
-}
 
   useEffect(() => {
     document.title = `${capitalizeFirstLetter(props.category)} - Master-mind`;
@@ -68,9 +77,9 @@ const updateNews = async () => {
   
   const fetchMoreData = async () => {
     const category = categoryMap[props.category] || 'breaking-news';
-    const apiKey = process.env.REACT_APP_GNEWS_API_KEY;
-    let url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&max=${props.pageSize}&page=${page + 1}&apikey=${apiKey}`;
-    setpage(page + 1);
+    const nextPage = page + 1;
+    const url = getNewsUrl(category, nextPage);
+    setpage(nextPage);
     try {
       let data = await fetch(url);
       let parsedData = await data.json();
