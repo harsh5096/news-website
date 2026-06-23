@@ -20,23 +20,34 @@ const News = (props) => {
   const [totalResults, settotalResults] = useState(0)
 
 
-// This function is responsible for fetching news data from the News API based on the provided props (such as country, category, and pageSize).
+// Category mapping from app categories to GNews categories
+const categoryMap = {
+  general: 'breaking-news',
+  business: 'business',
+  entertainment: 'entertainment',
+  health: 'health',
+  science: 'science',
+  sports: 'sports',
+  technology: 'technology',
+};
+
+// This function is responsible for fetching news data from GNews API.
 const updateNews = async () => {
-  const query = props.category ? props.category : 'news';
-  const apiKey = process.env.REACT_APP_NEWS_API_KEY;
-  const url = `https://newsapi.org/v2/everything?q=${query}&page=${page}&pageSize=${props.pageSize}&apiKey=${apiKey}`;
+  const category = categoryMap[props.category] || 'breaking-news';
+  const apiKey = process.env.REACT_APP_GNEWS_API_KEY;
+  const url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&max=${props.pageSize}&page=${page}&apikey=${apiKey}`;
   setloading(true);
   try {
     let data = await fetch(url);
     let parsedData = await data.json();
     console.log('API Response:', parsedData);
-    if (parsedData.status !== 'ok') {
-      console.error('API Error:', parsedData.message || 'Unknown error');
+    if (!parsedData.articles) {
+      console.error('API Error:', parsedData.errors || 'Unknown error');
       setarticles([]);
       settotalResults(0);
     } else {
       setarticles(parsedData.articles);
-      settotalResults(parsedData.totalResults);
+      settotalResults(parsedData.totalArticles);
     }
   } catch (error) {
     console.error('Fetch error:', error);
@@ -56,19 +67,19 @@ const updateNews = async () => {
   // This function is called when the user scrolls to fetch more data for infinite scrolling.
   
   const fetchMoreData = async () => {
-    const query = props.category ? props.category : 'news';
-    const apiKey = process.env.REACT_APP_NEWS_API_KEY;
-    let url = `https://newsapi.org/v2/everything?q=${query}&page=${page + 1}&pageSize=${props.pageSize}&apiKey=${apiKey}`;
+    const category = categoryMap[props.category] || 'breaking-news';
+    const apiKey = process.env.REACT_APP_GNEWS_API_KEY;
+    let url = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=en&max=${props.pageSize}&page=${page + 1}&apikey=${apiKey}`;
     setpage(page + 1);
     try {
       let data = await fetch(url);
       let parsedData = await data.json();
       console.log('API Response (more):', parsedData);
-      if (parsedData.status !== 'ok') {
-        console.error('API Error:', parsedData.message || 'Unknown error');
+      if (!parsedData.articles) {
+        console.error('API Error:', parsedData.errors || 'Unknown error');
       } else {
         setarticles(articles.concat(parsedData.articles));
-        settotalResults(parsedData.totalResults);
+        settotalResults(parsedData.totalArticles);
       }
     } catch (error) {
       console.error('Fetch error:', error);
@@ -98,10 +109,9 @@ const updateNews = async () => {
             <div className=" row " >
               {articles.map((element) => {
                 return <div className="col-md-4" key={element.url}>
-                  {/* "". It checks if element.title exists; if it does, it uses element.title; otherwise, it defaults to an empty string (""). 
-                  This is a way to handle cases where element.title might be undefined or null. */}
-                  <Newsitem title={element.title ? element.title : ""} description={element.description ? element.description : ""} imageurl={element.urlToImage}
-                    newsUrl={element.url} author={element.author} date={element.publishedAt} />
+                  {/* GNews uses element.image instead of element.urlToImage */}
+                  <Newsitem title={element.title ? element.title : ""} description={element.description ? element.description : ""} imageurl={element.image}
+                    newsUrl={element.url} author={element.source ? element.source.name : 'Unknown'} date={element.publishedAt} />
                 </div>
               })}
             </div>
