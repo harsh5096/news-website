@@ -7,7 +7,7 @@ export default function OptionSelection({ selectOption, arrayItems, option }) {
     <div className='container' > 
                {arrayItems.map((item) => {
                 return (
-                  <div className = "qn" onClick={() => selectOption(item.option)} >        
+                  <div className = "qn" onClick={() => selectOption(item.option)} key={item.id}>        
                   {/* <h3>{item.value}</h3> */}
                   <p>{item.description}</p>
                   </div>

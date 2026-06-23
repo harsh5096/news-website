@@ -23,8 +23,8 @@ const News = (props) => {
 // This function is responsible for fetching news data from the News API based on the provided props (such as country, category, and pageSize).
 const updateNews = async () => {
   const query = props.category ? props.category : 'news';
-  // Use the provided EC2 public IP for production
-  const url = `http://54.88.39.56:5000/api/news?q=${query}&page=${page}&pageSize=${props.pageSize}`;
+  const apiKey = process.env.REACT_APP_NEWS_API_KEY;
+  const url = `https://newsapi.org/v2/everything?q=${query}&page=${page}&pageSize=${props.pageSize}&apiKey=${apiKey}`;
   setloading(true);
   try {
     let data = await fetch(url);
@@ -57,8 +57,8 @@ const updateNews = async () => {
   
   const fetchMoreData = async () => {
     const query = props.category ? props.category : 'news';
-    // Use the provided EC2 public IP for production
-    let url = `http://54.88.39.56:5000/api/news?q=${query}&page=${page + 1}&pageSize=${props.pageSize}`;
+    const apiKey = process.env.REACT_APP_NEWS_API_KEY;
+    let url = `https://newsapi.org/v2/everything?q=${query}&page=${page + 1}&pageSize=${props.pageSize}&apiKey=${apiKey}`;
     setpage(page + 1);
     try {
       let data = await fetch(url);

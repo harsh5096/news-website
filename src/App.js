@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import Navbar from './components/Navbar';
 import News from './components/News';
@@ -22,16 +20,23 @@ const App = () => {
   };
 
   const doStuff = async () => {
-    let object = {
-      prompt: input
-    };
-
     try {
+      const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
       const response = await axios.post(
-        'http://localhost:5000/api/openai',
-        object
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: input }],
+          max_tokens: 100,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+        }
       );
-      setResult(response.data.result);
+      setResult(response.data.choices[0].message.content);
     } catch (error) {
       console.error(error);
     }
